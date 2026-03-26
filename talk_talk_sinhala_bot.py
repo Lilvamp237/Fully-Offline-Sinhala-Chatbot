@@ -95,6 +95,28 @@ if st.session_state.dark_mode:
         /* Main app background */
         .stApp {{
             background: linear-gradient(135deg, {SL_COLORS['dark_maroon']} 0%, #1a1a2e 100%);
+            color: white !important;
+        }}
+        
+        /* Make all text white in dark mode */
+        .stApp, .stApp p, .stApp span, .stApp div, .stMarkdown {{
+            color: white !important;
+        }}
+        
+        /* Chat message text color */
+        .stChatMessage, .stChatMessage p, .stChatMessage span, .stChatMessage div {{
+            color: white !important;
+        }}
+        
+        /* Top bar (header) styling */
+        header[data-testid="stHeader"] {{
+            background: linear-gradient(90deg, {SL_COLORS['maroon']} 0%, {SL_COLORS['dark_maroon']} 100%) !important;
+            border-bottom: 3px solid {SL_COLORS['gold']};
+        }}
+        
+        /* Deploy button and toolbar */
+        [data-testid="stToolbar"] {{
+            background: transparent !important;
         }}
         
         /* Header styling */
@@ -116,7 +138,7 @@ if st.session_state.dark_mode:
         
         /* Chat messages */
         .stChatMessage {{
-            background-color: rgba(255, 255, 255, 0.05) !important;
+            background-color: rgba(139, 21, 56, 0.2) !important;
             border-left: 4px solid {SL_COLORS['gold']};
             border-radius: 10px;
             padding: 10px;
@@ -141,11 +163,23 @@ if st.session_state.dark_mode:
         /* Input box styling */
         .stChatInputContainer {{
             border-top: 3px solid {SL_COLORS['gold']};
-            background: rgba(26, 26, 46, 0.95);
+            background: linear-gradient(135deg, {SL_COLORS['maroon']}, {SL_COLORS['dark_maroon']}) !important;
             padding: 10px;
             position: sticky;
             bottom: 0;
             z-index: 999;
+            box-shadow: 0 -4px 10px rgba(139, 21, 56, 0.5);
+        }}
+        
+        /* Text input field itself */
+        .stChatInputContainer input {{
+            color: white !important;
+            background-color: rgba(26, 26, 46, 0.8) !important;
+            border: 2px solid {SL_COLORS['gold']} !important;
+        }}
+        
+        .stChatInputContainer input::placeholder {{
+            color: rgba(255, 255, 255, 0.6) !important;
         }}
         
         /* Buttons */
