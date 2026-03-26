@@ -44,8 +44,8 @@ def speak(text):
 
 # --- 2. Streamlit UI ---
 st.set_page_config(
-    page_title="Talk Talk Bot", 
-    page_icon="🇱🇰",
+    page_title="Talk Talk Sinhala Bot", 
+    page_icon="SB",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -67,7 +67,7 @@ if "dark_mode" not in st.session_state:
 
 # Sidebar styling and controls
 with st.sidebar:
-    st.markdown("### 🇱🇰 Talk Talk Bot")
+    st.markdown("Talk Talk Sinhala Bot")
     st.markdown("---")
     
     # Dark mode toggle
@@ -282,7 +282,7 @@ else:
 # Main header
 st.markdown("""
 <div class="main-header">
-    <h1>🇱🇰 Talk Talk Bot (සිංහල)</h1>
+    <h1>Talk Talk Sinhala Bot (සිංහල)</h1>
 </div>
 """, unsafe_allow_html=True)
 
