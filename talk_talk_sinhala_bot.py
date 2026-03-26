@@ -9,14 +9,15 @@ from langchain_community.document_loaders import JSONLoader
 from langchain_community.vectorstores import Chroma
 from langchain_ollama import OllamaEmbeddings
 
-# Sri Lankan Flag Color Palette
-SL_COLORS = {
-    "maroon": "#8B1538",      # Deep maroon/red
-    "gold": "#FFBE3D",        # Gold/yellow
-    "green": "#006747",       # Green
-    "orange": "#FF671F",      # Orange/saffron
-    "dark_maroon": "#5C0E26", # Darker maroon for dark mode
-    "light_gold": "#FFD97D",  # Lighter gold for backgrounds
+# Forest Green Theme Color Palette
+THEME_COLORS = {
+    "dark_green": "#1B5E20",      # Dark forest green
+    "emerald": "#00C853",         # Bright emerald
+    "gold": "#FFD700",            # Gold accent
+    "light_green": "#4CAF50",     # Medium green
+    "forest": "#2E7D32",          # Forest green
+    "mint": "#A5D6A7",            # Light mint for backgrounds
+    "deep_forest": "#0D3B0D",     # Very dark green for dark mode
 }
 
 # --- 1. RAG Setup (Offline Vector DB) ---
@@ -89,12 +90,12 @@ with st.sidebar:
 
 # Apply custom CSS based on theme
 if st.session_state.dark_mode:
-    # Dark mode - Sri Lankan flag colors adapted for dark theme
+    # Dark mode - Forest Green Theme
     st.markdown(f"""
     <style>
         /* Main app background */
         .stApp {{
-            background: linear-gradient(135deg, {SL_COLORS['dark_maroon']} 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, {THEME_COLORS['deep_forest']} 0%, #0a1f0a 100%);
             color: white !important;
         }}
         
@@ -110,8 +111,8 @@ if st.session_state.dark_mode:
         
         /* Top bar (header) styling */
         header[data-testid="stHeader"] {{
-            background: linear-gradient(90deg, {SL_COLORS['maroon']} 0%, {SL_COLORS['dark_maroon']} 100%) !important;
-            border-bottom: 3px solid {SL_COLORS['gold']};
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']} 0%, {THEME_COLORS['forest']} 100%) !important;
+            border-bottom: 3px solid {THEME_COLORS['emerald']};
         }}
         
         /* Deploy button and toolbar */
@@ -121,7 +122,7 @@ if st.session_state.dark_mode:
         
         /* Header styling */
         .main-header {{
-            background: linear-gradient(90deg, {SL_COLORS['maroon']} 0%, {SL_COLORS['orange']} 50%, {SL_COLORS['gold']} 100%);
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']} 0%, {THEME_COLORS['emerald']} 50%, {THEME_COLORS['gold']} 100%);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
@@ -138,8 +139,8 @@ if st.session_state.dark_mode:
         
         /* Chat messages */
         .stChatMessage {{
-            background-color: rgba(139, 21, 56, 0.2) !important;
-            border-left: 4px solid {SL_COLORS['gold']};
+            background-color: rgba(27, 94, 32, 0.3) !important;
+            border-left: 4px solid {THEME_COLORS['emerald']};
             border-radius: 10px;
             padding: 10px;
             margin: 10px 0;
@@ -147,44 +148,88 @@ if st.session_state.dark_mode:
         
         /* User message specific */
         [data-testid="stChatMessageContent"]:has(+ [data-testid="stChatMessageAvatar"]) {{
-            background: linear-gradient(135deg, rgba(139, 21, 56, 0.3), rgba(0, 103, 71, 0.3));
-            border-left: 4px solid {SL_COLORS['green']};
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.2), rgba(76, 175, 80, 0.2));
+            border-left: 4px solid {THEME_COLORS['gold']};
         }}
         
         /* Sidebar styling */
         [data-testid="stSidebar"] {{
-            background: linear-gradient(180deg, {SL_COLORS['maroon']} 0%, {SL_COLORS['dark_maroon']} 100%);
+            background: linear-gradient(180deg, {THEME_COLORS['dark_green']} 0%, {THEME_COLORS['deep_forest']} 100%);
         }}
         
         [data-testid="stSidebar"] * {{
             color: white !important;
         }}
         
-        /* Input box styling */
+        /* Input box container styling */
         .stChatInputContainer {{
-            border-top: 3px solid {SL_COLORS['gold']};
-            background: linear-gradient(135deg, {SL_COLORS['maroon']}, {SL_COLORS['dark_maroon']}) !important;
-            padding: 10px;
-            position: sticky;
-            bottom: 0;
-            z-index: 999;
-            box-shadow: 0 -4px 10px rgba(139, 21, 56, 0.5);
+            border-top: 3px solid {THEME_COLORS['emerald']} !important;
+            background: linear-gradient(135deg, {THEME_COLORS['dark_green']}, {THEME_COLORS['forest']}) !important;
+            padding: 15px !important;
+            position: sticky !important;
+            bottom: 0 !important;
+            z-index: 999 !important;
+            box-shadow: 0 -4px 10px rgba(0, 200, 83, 0.3) !important;
+            border-radius: 0px !important;
+        }}
+        
+        /* Target ALL divs in the bottom area */
+        .stChatInputContainer *,
+        .stChatInputContainer > div,
+        .stChatInputContainer [data-testid="stChatInput"],
+        .stChatInputContainer [data-testid="stChatInput"] > div,
+        .stChatInputContainer form,
+        .stChatInputContainer form > div {{
+            background: transparent !important;
+        }}
+        
+        /* Bottom form container */
+        [data-testid="stBottom"],
+        [data-testid="stBottom"] > div {{
+            background: linear-gradient(135deg, rgba(13, 59, 13, 0.9), rgba(27, 94, 32, 0.9)) !important;
+        }}
+        
+        /* Main bottom block */
+        .main .block-container {{
+            padding-bottom: 0 !important;
+        }}
+        
+        /* Target white spaces */
+        .stApp > div:last-child,
+        .stApp [data-testid="stAppViewContainer"] > section:last-child {{
+            background: linear-gradient(135deg, rgba(13, 59, 13, 0.8), rgba(27, 94, 32, 0.8)) !important;
         }}
         
         /* Text input field itself */
         .stChatInputContainer input {{
             color: white !important;
-            background-color: rgba(26, 26, 46, 0.8) !important;
-            border: 2px solid {SL_COLORS['gold']} !important;
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.15), rgba(255, 215, 0, 0.1)) !important;
+            border: 3px solid {THEME_COLORS['emerald']} !important;
+            border-radius: 12px !important;
+            padding: 12px !important;
+            box-shadow: 0 0 15px rgba(0, 200, 83, 0.4) !important;
+        }}
+        
+        .stChatInputContainer input:focus {{
+            border: 3px solid {THEME_COLORS['gold']} !important;
+            box-shadow: 0 0 20px {THEME_COLORS['gold']}, 0 0 30px rgba(255, 215, 0, 0.3) !important;
         }}
         
         .stChatInputContainer input::placeholder {{
-            color: rgba(255, 255, 255, 0.6) !important;
+            color: rgba(165, 214, 167, 0.7) !important;
+        }}
+        
+        /* Submit button in chat input */
+        .stChatInputContainer button {{
+            background: linear-gradient(90deg, {THEME_COLORS['emerald']}, {THEME_COLORS['gold']}) !important;
+            border: none !important;
+            color: {THEME_COLORS['deep_forest']} !important;
+            font-weight: bold !important;
         }}
         
         /* Buttons */
         .stButton > button {{
-            background: linear-gradient(90deg, {SL_COLORS['maroon']}, {SL_COLORS['orange']});
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']}, {THEME_COLORS['emerald']});
             color: white;
             border: none;
             border-radius: 8px;
@@ -193,7 +238,7 @@ if st.session_state.dark_mode:
         }}
         
         .stButton > button:hover {{
-            background: linear-gradient(90deg, {SL_COLORS['orange']}, {SL_COLORS['gold']});
+            background: linear-gradient(90deg, {THEME_COLORS['emerald']}, {THEME_COLORS['gold']});
             transform: scale(1.05);
         }}
         
@@ -207,27 +252,33 @@ if st.session_state.dark_mode:
         }}
         
         ::-webkit-scrollbar-thumb {{
-            background: {SL_COLORS['gold']};
+            background: {THEME_COLORS['emerald']};
             border-radius: 5px;
         }}
         
         ::-webkit-scrollbar-thumb:hover {{
-            background: {SL_COLORS['orange']};
+            background: {THEME_COLORS['gold']};
         }}
     </style>
     """, unsafe_allow_html=True)
 else:
-    # Light mode - Sri Lankan flag colors
+    # Light mode - Forest Green Theme
     st.markdown(f"""
     <style>
         /* Main app background */
         .stApp {{
-            background: linear-gradient(135deg, {SL_COLORS['light_gold']} 0%, #ffffff 100%);
+            background: linear-gradient(135deg, {THEME_COLORS['mint']} 0%, #ffffff 100%);
+        }}
+        
+        /* Top bar (header) styling */
+        header[data-testid="stHeader"] {{
+            background: linear-gradient(90deg, {THEME_COLORS['light_green']} 0%, {THEME_COLORS['emerald']} 100%) !important;
+            border-bottom: 3px solid {THEME_COLORS['gold']};
         }}
         
         /* Header styling */
         .main-header {{
-            background: linear-gradient(90deg, {SL_COLORS['maroon']} 0%, {SL_COLORS['orange']} 50%, {SL_COLORS['gold']} 100%);
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']} 0%, {THEME_COLORS['emerald']} 50%, {THEME_COLORS['gold']} 100%);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
@@ -244,8 +295,8 @@ else:
         
         /* Chat messages */
         .stChatMessage {{
-            background-color: rgba(255, 255, 255, 0.8) !important;
-            border-left: 4px solid {SL_COLORS['gold']};
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-left: 4px solid {THEME_COLORS['emerald']};
             border-radius: 10px;
             padding: 10px;
             margin: 10px 0;
@@ -254,33 +305,83 @@ else:
         
         /* User message specific */
         [data-testid="stChatMessageContent"]:has(+ [data-testid="stChatMessageAvatar"]) {{
-            background: linear-gradient(135deg, rgba(139, 21, 56, 0.1), rgba(0, 103, 71, 0.1));
-            border-left: 4px solid {SL_COLORS['green']};
+            background: linear-gradient(135deg, rgba(27, 94, 32, 0.08), rgba(165, 214, 167, 0.15));
+            border-left: 4px solid {THEME_COLORS['gold']};
         }}
         
         /* Sidebar styling */
         [data-testid="stSidebar"] {{
-            background: linear-gradient(180deg, {SL_COLORS['maroon']} 0%, {SL_COLORS['dark_maroon']} 100%);
+            background: linear-gradient(180deg, {THEME_COLORS['dark_green']} 0%, {THEME_COLORS['forest']} 100%);
         }}
         
         [data-testid="stSidebar"] * {{
             color: white !important;
         }}
         
-        /* Input box styling */
+        /* Input box container styling */
         .stChatInputContainer {{
-            border-top: 3px solid {SL_COLORS['maroon']};
-            background: rgba(255, 255, 255, 0.95);
-            padding: 10px;
-            position: sticky;
-            bottom: 0;
-            z-index: 999;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-top: 3px solid {THEME_COLORS['emerald']} !important;
+            background: linear-gradient(135deg, rgba(165, 214, 167, 0.5), rgba(129, 199, 132, 0.5)) !important;
+            padding: 15px !important;
+            position: sticky !important;
+            bottom: 0 !important;
+            z-index: 999 !important;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
+            border-radius: 0px !important;
+        }}
+        
+        /* Target ALL divs in the bottom area */
+        .stChatInputContainer *,
+        .stChatInputContainer > div,
+        .stChatInputContainer [data-testid="stChatInput"],
+        .stChatInputContainer [data-testid="stChatInput"] > div,
+        .stChatInputContainer form,
+        .stChatInputContainer form > div {{
+            background: transparent !important;
+        }}
+        
+        /* Bottom form container */
+        [data-testid="stBottom"],
+        [data-testid="stBottom"] > div {{
+            background: linear-gradient(135deg, rgba(165, 214, 167, 0.4), rgba(200, 230, 201, 0.4)) !important;
+        }}
+        
+        /* Main bottom block */
+        .main .block-container {{
+            padding-bottom: 0 !important;
+        }}
+        
+        /* Target white spaces */
+        .stApp > div:last-child,
+        .stApp [data-testid="stAppViewContainer"] > section:last-child {{
+            background: linear-gradient(135deg, rgba(165, 214, 167, 0.3), rgba(200, 230, 201, 0.3)) !important;
+        }}
+        
+        /* Text input field itself */
+        .stChatInputContainer input {{
+            background: white !important;
+            border: 3px solid {THEME_COLORS['emerald']} !important;
+            border-radius: 12px !important;
+            padding: 12px !important;
+            box-shadow: 0 0 10px rgba(0, 200, 83, 0.3) !important;
+        }}
+        
+        .stChatInputContainer input:focus {{
+            border: 3px solid {THEME_COLORS['gold']} !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 25px rgba(0, 200, 83, 0.2) !important;
+        }}
+        
+        /* Submit button in chat input */
+        .stChatInputContainer button {{
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']}, {THEME_COLORS['emerald']}) !important;
+            border: none !important;
+            color: white !important;
+            font-weight: bold !important;
         }}
         
         /* Buttons */
         .stButton > button {{
-            background: linear-gradient(90deg, {SL_COLORS['maroon']}, {SL_COLORS['orange']});
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']}, {THEME_COLORS['emerald']});
             color: white;
             border: none;
             border-radius: 8px;
@@ -289,7 +390,7 @@ else:
         }}
         
         .stButton > button:hover {{
-            background: linear-gradient(90deg, {SL_COLORS['orange']}, {SL_COLORS['gold']});
+            background: linear-gradient(90deg, {THEME_COLORS['emerald']}, {THEME_COLORS['gold']});
             transform: scale(1.05);
         }}
         
@@ -303,12 +404,12 @@ else:
         }}
         
         ::-webkit-scrollbar-thumb {{
-            background: {SL_COLORS['maroon']};
+            background: {THEME_COLORS['emerald']};
             border-radius: 5px;
         }}
         
         ::-webkit-scrollbar-thumb:hover {{
-            background: {SL_COLORS['orange']};
+            background: {THEME_COLORS['gold']};
         }}
     </style>
     """, unsafe_allow_html=True)
