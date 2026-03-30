@@ -161,6 +161,49 @@ if st.session_state.dark_mode:
             color: white !important;
         }}
         
+        /* Voice button component styling */
+        iframe {{
+            background: transparent !important;
+        }}
+        
+        /* Column containing voice button */
+        [data-testid="column"] {{
+            background: transparent !important;
+        }}
+        
+        [data-testid="column"] > div {{
+            background: transparent !important;
+        }}
+        
+        /* Any stMarkdown or element containers */
+        [data-testid="stMarkdownContainer"],
+        [data-testid="element-container"] {{
+            background: transparent !important;
+        }}
+        
+        /* Streamlit mic recorder component */
+        .stMarkdown {{
+            background: transparent !important;
+        }}
+        
+        /* Target the voice button wrapper specifically */
+        div[data-testid="column"]:first-child,
+        div[data-testid="column"]:first-child > div,
+        div[data-testid="column"]:first-child div {{
+            background: transparent !important;
+            background-color: transparent !important;
+        }}
+        
+        /* All vertical blocks in columns */
+        .stVerticalBlock {{
+            background: transparent !important;
+        }}
+        
+        /* Element container with voice button */
+        [data-testid="stVerticalBlock"] > div {{
+            background: transparent !important;
+        }}
+        
         /* Input box container styling */
         .stChatInputContainer {{
             border-top: 3px solid {THEME_COLORS['emerald']} !important;
@@ -318,6 +361,49 @@ else:
             color: white !important;
         }}
         
+        /* Voice button component styling */
+        iframe {{
+            background: transparent !important;
+        }}
+        
+        /* Column containing voice button */
+        [data-testid="column"] {{
+            background: transparent !important;
+        }}
+        
+        [data-testid="column"] > div {{
+            background: transparent !important;
+        }}
+        
+        /* Any stMarkdown or element containers */
+        [data-testid="stMarkdownContainer"],
+        [data-testid="element-container"] {{
+            background: transparent !important;
+        }}
+        
+        /* Streamlit mic recorder component */
+        .stMarkdown {{
+            background: transparent !important;
+        }}
+        
+        /* Target the voice button wrapper specifically */
+        div[data-testid="column"]:first-child,
+        div[data-testid="column"]:first-child > div,
+        div[data-testid="column"]:first-child div {{
+            background: transparent !important;
+            background-color: transparent !important;
+        }}
+        
+        /* All vertical blocks in columns */
+        .stVerticalBlock {{
+            background: transparent !important;
+        }}
+        
+        /* Element container with voice button */
+        [data-testid="stVerticalBlock"] > div {{
+            background: transparent !important;
+        }}
+        
         /* Input box container styling */
         .stChatInputContainer {{
             border-top: 3px solid {THEME_COLORS['emerald']} !important;
@@ -410,6 +496,32 @@ else:
         
         ::-webkit-scrollbar-thumb:hover {{
             background: {THEME_COLORS['gold']};
+        }}
+    </style>
+    
+    <style>
+        /* Aggressive voice button box removal */
+        [data-testid="column"]:first-of-type * {{
+            background-color: transparent !important;
+            background: transparent !important;
+        }}
+        
+        /* Target streamlit component wrappers */
+        .element-container {{
+            background: transparent !important;
+        }}
+        
+        .stMarkdown > div {{
+            background: transparent !important;
+        }}
+        
+        /* Remove any default backgrounds in the bottom area */
+        section[data-testid="stVerticalBlock"] > div:first-child [data-testid="column"] {{
+            background: transparent !important;
+        }}
+        
+        section[data-testid="stVerticalBlock"] > div:first-child [data-testid="column"] * {{
+            background: transparent !important;
         }}
     </style>
     """, unsafe_allow_html=True)
