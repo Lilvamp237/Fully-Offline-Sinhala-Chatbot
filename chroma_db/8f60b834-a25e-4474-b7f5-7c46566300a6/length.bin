@@ -1,7 +1,0 @@
-invalid type: string "ශ\u{dca}\u{200d}ර\u{dd3} ලංක\u{dcf}වේ අගන\u{dd4}වර ශ\u{dca}\u{200d}ර\u{dd3} ජයවර\u{dca}ධනප\u{dd4}ර කෝට\u{dca}ටේ වේ.", expected i64rations.
-CREATE TABLE maintenance_log (
-  id INT PRIMARY KEY,
-  timestamp INT NOT NULL,
-  operation TEXT NOT NULL
-);
-0a0e7e93111a01789addf64961c6127c�9Q�aMsysdb00007-collection-config.s
