@@ -8,6 +8,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.vectorstores import Chroma
 from langchain_ollama import OllamaEmbeddings
+# Add this to your imports at the top
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # Forest Green Theme Color Palette
 THEME_COLORS = {
@@ -30,10 +32,11 @@ def init_vector_db():
     # Split text into chunks for Gemma 3's 128K context window
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = text_splitter.split_documents(docs)
-    
+    # Use a local HuggingFace multilingual model instead of Nomic
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     # Using local embeddings (Run 'ollama pull nomic-embed-text' first)
-    embeddings = OllamaEmbeddings(model="nomic-embed-text")
-    return Chroma.from_documents(documents=chunks, embedding=embeddings, persist_directory="./chroma_db")
+    #embeddings = OllamaEmbeddings(model="nomic-embed-text")
+    return Chroma.from_documents(documents=chunks, embedding=embeddings, persist_directory="./chroma_db", collection_name="sinhala_bot_384")
 
 # Initialize the library
 vectorstore = init_vector_db()
@@ -591,22 +594,33 @@ if final_query:
     # --- C. Generate Assistant Response with streaming ---
     # We clearly separate the Context from the Question
     prompt = f"""
-    සන්දර්භය (Context): {context}
+    සපයා ඇති තොරතුරු (Provided Context): {context}
     
-    ප්‍රශ්නය (User Question): {final_query}
+    පරිශීලකයාගේ ප්‍රශ්නය (User Question): {final_query}
     
-    උපදෙස්: ඉහත සන්දර්භය ප්‍රශ්නයට අදාළ නම් පමණක් එය භාවිතා කරන්න. ප්‍රශ්නයට අදාළ නොවන කරුණු ඇතුළත් නොකරන්න. සිංහලෙන් පමණක් පිළිතුරු දෙන්න.
+    උපදෙස්: 
+    1. සපයා ඇති තොරතුරු පරිශීලකයාගේ ප්‍රශ්නයට අදාළ නම්, එය භාවිතා කර පිළිතුරු දෙන්න.
+    2. සපයා ඇති තොරතුරු අදාළ නොවේ නම් හෝ ප්‍රමාණවත් නොවේ නම්, ඔබේ සාමාන්‍ය දැනුම භාවිතා කර පිළිතුරු දෙන්න.
+    3. සෑම විටම මිත්‍රශීලීව, සිංහල භාෂාවෙන් පමණක් පිළිතුරු දෙන්න.
     """
-    
+    # 1. Build the message history for the LLM
+    api_messages = []
+    # Add all previous history (excluding the most recent user query we just appended)
+    for msg in st.session_state.messages[:-1]:
+        api_messages.append({"role": msg["role"], "content": msg["content"]})
+    # Add the current prompt (which includes the hidden RAG context)
+    api_messages.append({"role": "user", "content": prompt})
+
     # Display streaming response
     with chat_container:
         with st.chat_message("assistant"):
             response_placeholder = st.empty()
             full_res = ""
             
+            # 2. Pass the FULL api_messages array, not just the single prompt
             stream = ollama.chat(
                 model='talk_talk_bot', 
-                messages=[{"role": "user", "content": prompt}], 
+                messages=api_messages, 
                 stream=True
             )
             
