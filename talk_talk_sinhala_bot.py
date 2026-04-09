@@ -2,6 +2,10 @@ import streamlit as st
 import ollama
 import pyttsx3
 from streamlit_mic_recorder import speech_to_text
+import json
+from langchain_core.documents import Document
+# from langchain_community.vectorstores import Chroma (හෝ ඔබ භාවිතා කරන Vector DB එක)
+# from langchain_community.embeddings import OllamaEmbeddings
 
 # CORRECTED IMPORTS FOR 2026
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -25,18 +29,29 @@ THEME_COLORS = {
 # --- 1. RAG Setup (Offline Vector DB) ---
 @st.cache_resource
 def init_vector_db():
-    # Loading local ground-truth facts from /data/facts.json
-    loader = JSONLoader(file_path='./data/facts.json', jq_schema='.[] | .fact', text_content=False)
-    docs = loader.load()
-    
-    # Split text into chunks for Gemma 3's 128K context window
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    chunks = text_splitter.split_documents(docs)
-    # Use a local HuggingFace multilingual model instead of Nomic
+    # 1. Load local ground-truth facts using standard json library
+    with open('./data/facts.json', 'r', encoding='utf-8') as file:
+        data = json.load(file)
+        
+    # 2. Create full documents without splitting (No text_splitter needed!)
+    documents = []
+    for item in data:
+        doc = Document(
+            page_content=item["fact"], 
+            metadata={"category": item["category"]}
+        )
+        documents.append(doc)
+        
+    # 3. Initialize your local HuggingFace multilingual embeddings
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-    # Using local embeddings (Run 'ollama pull nomic-embed-text' first)
-    #embeddings = OllamaEmbeddings(model="nomic-embed-text")
-    return Chroma.from_documents(documents=chunks, embedding=embeddings, persist_directory="./chroma_db", collection_name="sinhala_bot_384")
+    
+    # 4. Create and return Vector DB using the full 'documents' array directly
+    return Chroma.from_documents(
+        documents=documents, 
+        embedding=embeddings, 
+        persist_directory="./chroma_db", 
+        collection_name="sinhala_bot_384"
+    )
 
 # Initialize the library
 vectorstore = init_vector_db()
@@ -587,22 +602,36 @@ if final_query:
         with st.chat_message("user"):
             st.markdown(final_query)
 
-    # B. RAG Step: Search your facts.json for the answer
-    docs = vectorstore.similarity_search(final_query, k=2)
-    context = " ".join([d.page_content for d in docs])
+    # B. RAG Step: Search your facts.json for the answer with improved retrieval
+    docs = vectorstore.similarity_search(final_query, k=5)  # Increased from k=2 to k=5
+    
+    # Filter by relevance threshold and build context
+    relevant_docs = []
+    for doc in docs:
+        # Simple relevance scoring (you could add more sophisticated scoring)
+        if doc.metadata.get('_distance', 0) < 0.7 or len(docs) < 3:
+            relevant_docs.append(doc)
+    
+    # If no highly relevant documents found, still use top results as fallback
+    if not relevant_docs and docs:
+        relevant_docs = docs[:3]
+    
+    context = " ".join([d.page_content for d in relevant_docs]) if relevant_docs else "අදාළ තොරතුරු සම්පූර්ණ දැනුම විසින් ගෙන එනු ලැබුවේ නැත."
 
     # --- C. Generate Assistant Response with streaming ---
-    # We clearly separate the Context from the Question
+    # Improved prompt with better context separation and confidence indicators
     prompt = f"""
-    සපයා ඇති තොරතුරු (Provided Context): {context}
-    
-    පරිශීලකයාගේ ප්‍රශ්නය (User Question): {final_query}
-    
-    උපදෙස්: 
-    1. සපයා ඇති තොරතුරු පරිශීලකයාගේ ප්‍රශ්නයට අදාළ නම්, එය භාවිතා කර පිළිතුරු දෙන්න.
-    2. සපයා ඇති තොරතුරු අදාළ නොවේ නම් හෝ ප්‍රමාණවත් නොවේ නම්, ඔබේ සාමාන්‍ය දැනුම භාවිතා කර පිළිතුරු දෙන්න.
-    3. සෑම විටම මිත්‍රශීලීව, සිංහල භාෂාවෙන් පමණක් පිළිතුරු දෙන්න.
-    """
+සපයා ඇති ශ්‍රී ලංකා ගැනේ තොරතුරු (Sri Lankan Context): {context}
+
+පරිශීලකයාගේ ප්‍රශ්නය (User Question): {final_query}
+
+උපදෙස් (Instructions): 
+1. සපයා ඇති තොරතුරු ප්‍රශ්නයට ඉතා අදාළ නම්, එම තොරතුරු භාවිතා කර පිළිතුරු දෙන්න.
+2. සපයා ඇති තොරතුරු අදාළ නොවේ නම් හෝ ප්‍රමාණවත් නොවේ නම්, ඔබේ ගිණුම් හා සාමාන්‍ය දැනුම භාවිතා කරමින් පිළිතුරු දෙන්න.
+3. සැමවිටම මිත්‍රශීලීව, නිවැරදිව, සිංහල භාෂාවෙන් පිළිතුරු දෙන්න.
+4. දැනන්නේ නැතිනම් "මට එම ගැන දැනීමක් නැත" ලෙස පවසන්න - අනුමාන නොකරන්න.
+5. ඉතා කෙටි, පැහැදිලි, සරල පිළිතුරු දෙන්න.
+"""
     # 1. Build the message history for the LLM
     api_messages = []
     # Add all previous history (excluding the most recent user query we just appended)
