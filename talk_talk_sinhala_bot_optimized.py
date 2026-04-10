@@ -4,15 +4,10 @@ import pyttsx3
 from streamlit_mic_recorder import speech_to_text
 import json
 from langchain_core.documents import Document
-# from langchain_community.vectorstores import Chroma (හෝ ඔබ භාවිතා කරන Vector DB එක)
-# from langchain_community.embeddings import OllamaEmbeddings
-
-# CORRECTED IMPORTS FOR 2026
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.vectorstores import Chroma
 from langchain_ollama import OllamaEmbeddings
-# Add this to your imports at the top
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # Forest Green Theme Color Palette
@@ -222,35 +217,14 @@ if st.session_state.dark_mode:
             background: transparent !important;
         }}
         
-        /* Input box container styling */
+        /* Chat input container */
         .stChatInputContainer {{
-            border-top: 3px solid {THEME_COLORS['emerald']} !important;
-            background: linear-gradient(135deg, {THEME_COLORS['dark_green']}, {THEME_COLORS['forest']}) !important;
-            padding: 15px !important;
-            position: sticky !important;
-            bottom: 0 !important;
-            z-index: 999 !important;
-            box-shadow: 0 -4px 10px rgba(0, 200, 83, 0.3) !important;
-            border-radius: 0px !important;
-        }}
-        
-        /* Target ALL divs in the bottom area */
-        .stChatInputContainer *,
-        .stChatInputContainer > div,
-        .stChatInputContainer [data-testid="stChatInput"],
-        .stChatInputContainer [data-testid="stChatInput"] > div,
-        .stChatInputContainer form,
-        .stChatInputContainer form > div {{
             background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
         }}
         
-        /* Bottom form container */
-        [data-testid="stBottom"],
-        [data-testid="stBottom"] > div {{
-            background: linear-gradient(135deg, rgba(13, 59, 13, 0.9), rgba(27, 94, 32, 0.9)) !important;
-        }}
-        
-        /* Main bottom block */
+        /* Ensure the entire bottom section is transparent */
         .main .block-container {{
             padding-bottom: 0 !important;
         }}
@@ -258,33 +232,29 @@ if st.session_state.dark_mode:
         /* Target white spaces */
         .stApp > div:last-child,
         .stApp [data-testid="stAppViewContainer"] > section:last-child {{
-            background: linear-gradient(135deg, rgba(13, 59, 13, 0.8), rgba(27, 94, 32, 0.8)) !important;
+            background: linear-gradient(135deg, {THEME_COLORS['deep_forest']} 0%, #0a1f0a 100%) !important;
         }}
         
         /* Text input field itself */
         .stChatInputContainer input {{
-            color: white !important;
-            background: linear-gradient(135deg, rgba(0, 200, 83, 0.15), rgba(255, 215, 0, 0.1)) !important;
-            border: 3px solid {THEME_COLORS['emerald']} !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 2px solid {THEME_COLORS['emerald']} !important;
             border-radius: 12px !important;
             padding: 12px !important;
-            box-shadow: 0 0 15px rgba(0, 200, 83, 0.4) !important;
+            box-shadow: 0 0 10px rgba(0, 200, 83, 0.3) !important;
+            color: white !important;
         }}
         
         .stChatInputContainer input:focus {{
             border: 3px solid {THEME_COLORS['gold']} !important;
-            box-shadow: 0 0 20px {THEME_COLORS['gold']}, 0 0 30px rgba(255, 215, 0, 0.3) !important;
-        }}
-        
-        .stChatInputContainer input::placeholder {{
-            color: rgba(165, 214, 167, 0.7) !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 25px rgba(0, 200, 83, 0.2) !important;
         }}
         
         /* Submit button in chat input */
         .stChatInputContainer button {{
-            background: linear-gradient(90deg, {THEME_COLORS['emerald']}, {THEME_COLORS['gold']}) !important;
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']}, {THEME_COLORS['emerald']}) !important;
             border: none !important;
-            color: {THEME_COLORS['deep_forest']} !important;
+            color: white !important;
             font-weight: bold !important;
         }}
         
@@ -321,6 +291,32 @@ if st.session_state.dark_mode:
             background: {THEME_COLORS['gold']};
         }}
     </style>
+    
+    <style>
+        /* Aggressive voice button box removal */
+        [data-testid="column"]:first-of-type * {{
+            background-color: transparent !important;
+            background: transparent !important;
+        }}
+        
+        /* Target streamlit component wrappers */
+        .element-container {{
+            background: transparent !important;
+        }}
+        
+        .stMarkdown > div {{
+            background: transparent !important;
+        }}
+        
+        /* Remove any default backgrounds in the bottom area */
+        section[data-testid="stVerticalBlock"] > div:first-child [data-testid="column"] {{
+            background: transparent !important;
+        }}
+        
+        section[data-testid="stVerticalBlock"] > div:first-child [data-testid="column"] * {{
+            background: transparent !important;
+        }}
+    </style>
     """, unsafe_allow_html=True)
 else:
     # Light mode - Forest Green Theme
@@ -328,13 +324,13 @@ else:
     <style>
         /* Main app background */
         .stApp {{
-            background: linear-gradient(135deg, {THEME_COLORS['mint']} 0%, #ffffff 100%);
+            background: linear-gradient(135deg, rgba(165, 214, 167, 0.3), rgba(200, 230, 201, 0.3));
         }}
         
         /* Top bar (header) styling */
         header[data-testid="stHeader"] {{
-            background: linear-gradient(90deg, {THEME_COLORS['light_green']} 0%, {THEME_COLORS['emerald']} 100%) !important;
-            border-bottom: 3px solid {THEME_COLORS['gold']};
+            background: linear-gradient(90deg, {THEME_COLORS['dark_green']} 0%, {THEME_COLORS['forest']} 100%) !important;
+            border-bottom: 3px solid {THEME_COLORS['emerald']};
         }}
         
         /* Header styling */
@@ -356,7 +352,7 @@ else:
         
         /* Chat messages */
         .stChatMessage {{
-            background-color: rgba(255, 255, 255, 0.9) !important;
+            background-color: rgba(255, 255, 255, 0.8) !important;
             border-left: 4px solid {THEME_COLORS['emerald']};
             border-radius: 10px;
             padding: 10px;
@@ -366,7 +362,7 @@ else:
         
         /* User message specific */
         [data-testid="stChatMessageContent"]:has(+ [data-testid="stChatMessageAvatar"]) {{
-            background: linear-gradient(135deg, rgba(27, 94, 32, 0.08), rgba(165, 214, 167, 0.15));
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.1), rgba(76, 175, 80, 0.1));
             border-left: 4px solid {THEME_COLORS['gold']};
         }}
         
@@ -384,7 +380,6 @@ else:
             background: transparent !important;
         }}
         
-        /* Column containing voice button */
         [data-testid="column"] {{
             background: transparent !important;
         }}
@@ -393,18 +388,15 @@ else:
             background: transparent !important;
         }}
         
-        /* Any stMarkdown or element containers */
         [data-testid="stMarkdownContainer"],
         [data-testid="element-container"] {{
             background: transparent !important;
         }}
         
-        /* Streamlit mic recorder component */
         .stMarkdown {{
             background: transparent !important;
         }}
         
-        /* Target the voice button wrapper specifically */
         div[data-testid="column"]:first-child,
         div[data-testid="column"]:first-child > div,
         div[data-testid="column"]:first-child div {{
@@ -412,45 +404,21 @@ else:
             background-color: transparent !important;
         }}
         
-        /* All vertical blocks in columns */
         .stVerticalBlock {{
             background: transparent !important;
         }}
         
-        /* Element container with voice button */
         [data-testid="stVerticalBlock"] > div {{
             background: transparent !important;
         }}
         
-        /* Input box container styling */
+        /* Chat input container */
         .stChatInputContainer {{
-            border-top: 3px solid {THEME_COLORS['emerald']} !important;
-            background: linear-gradient(135deg, rgba(165, 214, 167, 0.5), rgba(129, 199, 132, 0.5)) !important;
-            padding: 15px !important;
-            position: sticky !important;
-            bottom: 0 !important;
-            z-index: 999 !important;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
-            border-radius: 0px !important;
-        }}
-        
-        /* Target ALL divs in the bottom area */
-        .stChatInputContainer *,
-        .stChatInputContainer > div,
-        .stChatInputContainer [data-testid="stChatInput"],
-        .stChatInputContainer [data-testid="stChatInput"] > div,
-        .stChatInputContainer form,
-        .stChatInputContainer form > div {{
             background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
         }}
         
-        /* Bottom form container */
-        [data-testid="stBottom"],
-        [data-testid="stBottom"] > div {{
-            background: linear-gradient(135deg, rgba(165, 214, 167, 0.4), rgba(200, 230, 201, 0.4)) !important;
-        }}
-        
-        /* Main bottom block */
         .main .block-container {{
             padding-bottom: 0 !important;
         }}
@@ -603,25 +571,28 @@ if final_query:
             st.markdown(final_query)
 
     # B. RAG Step: Search your facts.json for the answer with improved retrieval
-    docs_with_scores = vectorstore.similarity_search_with_score(final_query, k=6)
+    docs_with_scores = vectorstore.similarity_search_with_score(final_query, k=5)
     
-    # Filter by relevance threshold and build context (lower score = more similar)
+    # IMPROVED: More intelligent relevance filtering
     relevant_docs = []
-    rag_confidence = "low"  # Track confidence level for dynamic handling
+    context_signal = "NO_CONTEXT"  # Signal to LLM about context quality
     
     if docs_with_scores:
         best_score = docs_with_scores[0][1]
-        # Stricter threshold: only use docs that are highly relevant (score < 0.35)
-        dynamic_threshold = min(0.35, best_score + 0.05)
-        relevant_docs = [doc for doc, score in docs_with_scores if score <= dynamic_threshold]
         
-        # Determine RAG confidence based on top result score
-        if best_score < 0.25:
-            rag_confidence = "high"
-        elif best_score < 0.40:
-            rag_confidence = "medium"
+        # Stricter threshold for high-confidence retrieval
+        # Lower score = more similar (cosine distance)
+        if best_score <= 0.35:
+            # HIGH CONFIDENCE: Very relevant context found
+            context_signal = "HIGH_CONFIDENCE"
+            relevant_docs = [doc for doc, score in docs_with_scores if score <= 0.40]
+        elif best_score <= 0.50:
+            # MEDIUM CONFIDENCE: Possibly relevant context
+            context_signal = "MEDIUM_CONFIDENCE"
+            relevant_docs = [doc for doc, score in docs_with_scores if score <= 0.50]
+        # else: NO_CONTEXT - let LLM use general knowledge
     
-    # Deduplicate and keep the most relevant few
+    # Deduplicate and build context string
     seen = set()
     deduped_docs = []
     for doc in relevant_docs:
@@ -629,30 +600,40 @@ if final_query:
             deduped_docs.append(doc)
             seen.add(doc.page_content)
     
-    context = " ".join([d.page_content for d in deduped_docs[:3]]) if deduped_docs else ""
-    has_rag_context = bool(context)
+    context = "\n".join([d.page_content for d in deduped_docs[:3]]) if deduped_docs else ""
 
-    # --- C. Generate Assistant Response with streaming ---
-    # Optimized prompt: cleaner, more direct, eliminates robotic phrasing
-    if has_rag_context:
-        # When RAG context exists, use it directly without meta-commentary
-        prompt = f"""ශ්‍රී ලංකා තොරතුරු:
+    # --- C. OPTIMIZED PROMPT: Clear instructions, no robotic phrasing triggers ---
+    # This prompt is designed to eliminate hallucinations while allowing general knowledge
+    if context_signal == "HIGH_CONFIDENCE":
+        # Strong context available - prioritize it
+        prompt = f"""ප්‍රශ්නය: {final_query}
+
+අදාළ කරුණු:
 {context}
 
-පරිශීලකයාගේ ප්‍රශ්නය: {final_query}
+උපදෙස්: ඉහත කරුණු භාවිතයෙන් ප්‍රශ්නයට පිළිතුරු දෙන්න. ස්වභාවික සිංහල භාෂාවෙන් කෙලින්ම පිළිතුර ලබා දෙන්න. කිසිදු විස්තරාත්මක වචන හෝ වාක්‍ය ඛණ්ඩ ("සන්දර්භයට අනුව", "ලබා දී ඇති තොරතුරු අනුව" වැනි) භාවිතා නොකරන්න."""
 
-උපදෙස්: ඉහතින් ලබා දී ඇති ශ්‍රී ලංකා තොරතුරු භාවිතා කරමින් සෙවනැලි, ස්වභාවික, ග්‍රාමාරුඩිකව නිවැරදි සිංහල පිළිතුර ඉදිරිපත් කරන්න. "සන්දර්භයට අනුව" හෝ "ලබා දී ඇති තොරතුරු අනුව" වැනි වාක්‍ය නොතිස්සේ, කෙලින්ම ප්‍රශ්නයට පිළිතුරු දෙන්න. අනුමාන කිරීම්ට එක්සත් නොවන්න."""
+    elif context_signal == "MEDIUM_CONFIDENCE":
+        # Possible context - give LLM choice to use or ignore
+        prompt = f"""ප්‍රශ්නය: {final_query}
+
+සම්බන්ධ විය හැකි කරුණු:
+{context}
+
+උපදෙස්: මෙම ප්‍රශ්නයට පිළිතුරු දෙන්න. ඉහත කරුණු අදාළ නම් ඒවා භාවිතා කරන්න. නොඑසේ නම්, ඔබේ සාමාන්‍ය දැනුම භාවිතයෙන් නිවැරදි පිළිතුරක් ලබා දෙන්න. ස්වභාවික සිංහල භාෂාවෙන් කෙලින්ම පිළිතුර ලබා දෙන්න. විස්තරාත්මක වචන ("සන්දර්භයට අනුව", "මා දන්නා පරිදි" වැනි) භාවිතා නොකරන්න."""
+
     else:
-        # When no RAG context, encourage use of general knowledge
-        prompt = f"""පරිශීලකයාගේ ප්‍රශ්නය: {final_query}
+        # NO_CONTEXT - rely entirely on general knowledge
+        prompt = f"""ප්‍රශ්නය: {final_query}
 
-උපදෙස්: සිංහල භාෂාවෙන් ස්වභාවික, ග්‍රාමාරුඩිකව නිවැරදි පිළිතුර දෙන්න. ඔබේ සෙවනැලි දැනුම (ගණිතය, විද්‍යාව, උතුරුදෙස ඉතිහාසය ඇතුළු) භාවිතා කරමින්, නිවැරදි සහ විස්තෘත පිළිතුර ඉදිරිපත් කරන්න. "සන්දර්භයට අනුව" වැනි වාක්‍ය නොතිස්සේ, කෙලින්ම ප්‍රශ්නයට පිළිතුරු දෙන්න."""
-    # 1. Build the message history for the LLM
+උපදෙස්: ඔබේ සාමාන්‍ය දැනුම භාවිතයෙන් මෙම ප්‍රශ්නයට නිවැරදිව පිළිතුරු දෙන්න. ස්වභාවික සිංහල භාෂාවෙන් කෙලින්ම පිළිතුර ලබා දෙන්න. ඔබට නිශ්චිතව නොදන්නා දෙයක් නම්, කාරුණිකව එය නොදන්නා බව පමණක් සඳහන් කරන්න."""
+
+    # Build the message history for the LLM
     api_messages = []
     # Add all previous history (excluding the most recent user query we just appended)
     for msg in st.session_state.messages[:-1]:
         api_messages.append({"role": msg["role"], "content": msg["content"]})
-    # Add the current prompt (which includes the hidden RAG context)
+    # Add the current optimized prompt
     api_messages.append({"role": "user", "content": prompt})
 
     # Display streaming response
@@ -661,7 +642,6 @@ if final_query:
             response_placeholder = st.empty()
             full_res = ""
             
-            # 2. Pass the FULL api_messages array, not just the single prompt
             stream = ollama.chat(
                 model='talk_talk_bot', 
                 messages=api_messages, 
@@ -677,8 +657,8 @@ if final_query:
     # D. Save assistant response to history
     st.session_state.messages.append({"role": "assistant", "content": full_res})
     
-    # E. Speak the response
-    #speak(full_res)
+    # E. Speak the response (optional - uncomment to enable)
+    # speak(full_res)
     
     # F. Rerun to clear input and update display
     st.rerun()
